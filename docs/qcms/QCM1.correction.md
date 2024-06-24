@@ -27,4 +27,3 @@ Pour enregistrer et quitter un fichier dans VIM
 - ❌ VIM ???
 
 VIM = éditeur de texte dans le terminal (outil CLI). Il arrive que VIM s'ouvre lorsqu'on fait certaines opérations avec Git pour valider, pour demander un message, etc... 
-
