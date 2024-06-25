@@ -1,0 +1,17 @@
+import "dotenv/config";
+
+// CommonJS (import)
+// const { Sequelize } = require('sequelize');
+
+// ECMAScript modules (import)
+import { Sequelize } from "sequelize";
+
+// ECMAScript modules (export)
+// Instance de connexion à la base de données Postgres
+export const sequelize = new Sequelize(process.env.PG_URL);
+
+// Test rapide
+// sequelize.authenticate();
+
+// CommonJS (export)
+// module.exports = sequelize;

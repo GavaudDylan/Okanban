@@ -5,6 +5,7 @@
   "directories": {
     "doc": "docs"
   },
+  "type": "module",
   "scripts": {
     "db:create": "psql -U okanban -d okanban -f data/create_tables.sql",
     "db:populate": "psql -U okanban -d okanban -f data/populate_tables.sql",
