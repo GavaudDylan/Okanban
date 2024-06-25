@@ -1,0 +1,16 @@
+{
+  "name": "s12-okanban-api-enzoclock",
+  "version": "1.0.0",
+  "description": "Le joyeux Kanban des Pavlova",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "db:create": "psql -U okanban -d okanban -f data/create_tables.sql",
+    "db:populate": "psql -U okanban -d okanban -f data/populate_tables.sql",
+    "db:reset": "npm run db:create && npm run db:populate"
+  },
+  "keywords": ["kanban", "board", "gestion de projet"],
+  "author": "pavlova@oclock.io",
+  "license": "ISC"
+}
