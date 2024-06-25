@@ -2,22 +2,24 @@ import { Model, DataTypes } from "sequelize"; // Module NPM
 
 import { sequelize } from "./dbClientSequelize.js"; // Module local
 
-export class List extends Model {}
+export class Card extends Model {}
 
-List.init(
+Card.init(
   {
-    title: {
+    content: {
       type: DataTypes.TEXT,
-      allowNull: false,
     },
     position: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 1,
     },
+    color: {
+      type: DataTypes.STRING(7),
+    },
   },
   {
     sequelize,
-    tableName: "list",
+    tableName: "card",
   }
 );
