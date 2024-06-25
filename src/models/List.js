@@ -20,4 +20,6 @@ List.init({
 });
 
 // Test rapide
-// List.findAll();
+// List.findAll(); // => SELECT "title", "position" FROM "list"    // Note : également toujours le created_at, updated_at et l'id
+
+
