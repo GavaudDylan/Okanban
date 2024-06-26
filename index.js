@@ -8,6 +8,10 @@ import { router } from "./src/router.js";
 // Create app
 const app = express();
 
+// Add body parser
+app.use(express.urlencoded({ extended: true })); // Parser les bodies de type "application/www-form-urlencoded"
+app.use(express.json()); // Parser les bodies de type "application/json"
+
 // Configure routes
 app.use(router);
 
