@@ -3,14 +3,13 @@ import "dotenv/config";
 
 // Import dependencies
 import express from "express";
+import { router } from "./src/router.js";
 
 // Create app
 const app = express();
 
 // Configure routes
-app.get("/", (req, res) => {
-  res.send("OK");
-});
+app.use(router);
 
 // Start server
 const port = process.env.PORT || 3000;
