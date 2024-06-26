@@ -56,8 +56,7 @@ export async function createList(req, res) {
 
 export async function getListById(req, res) {
   try {
-    const listId = req.params.id;
-    const list = await List.findByPk(listId);
+    const list = await List.findByPk(req.params.id);
 
     if (!list) {
       return res
@@ -66,6 +65,26 @@ export async function getListById(req, res) {
     }
 
     res.json(list);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("Unexpected server error. Please try again later.");
+  }
+}
+
+export async function deleteList(req, res) {
+  try {
+    const listId = req.params.id;
+    const list = await List.findByPk(listId);
+
+    if (!list) {
+      return res
+        .status(404)
+        .json({ error: "List not found. Please verify the provided ID." });
+    }
+    await list.destroy();
+    // const deletedLisMessage = "List deleted";
+    res.json({ message: "List deleted." });
+    res.status(204);
   } catch (error) {
     console.error(error);
     res.status(500).json("Unexpected server error. Please try again later.");

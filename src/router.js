@@ -7,4 +7,4 @@ router.get("/lists", listController.getAllLists);
 router.get("/lists/:id", listController.getListById);
 router.post("/lists", listController.createList);
 // router.patch("/lists/:id")
-// router.delete ("lists/:id")
+router.delete("/lists/:id", listController.deleteList);
