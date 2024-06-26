@@ -1,5 +1,4 @@
-import { associations } from "./associations.js";
-const { Card, List, Tag } = associations;
+import { Card, List, Tag } from "./associations.js";
 main();
 
 async function main() {
