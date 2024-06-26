@@ -1,23 +1,22 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "./dbClientSequelize.js";
 
-export class Card extends Model {}
+export class Tag extends Model {}
 
-Card.init({
-  content: {
+Tag.init({
+  name: {
     type: DataTypes.TEXT,
     allowNull: false
   },
-  position: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 1
-  },
   color: {
-    type: DataTypes.STRING(7), // VARCHAR(7)
+    type: DataTypes.STRING(7),
     defaultValue: "#ffffff"
   }
 }, {
   sequelize,
-  tableName: "card"
+  tableName: "tag"
 });
+
+// TOP-LEVEL await permis en ESM
+// const tags = await Tag.findAll();
+// console.log(tags);
