@@ -15,15 +15,15 @@ Card.belongsTo(List, {
 Card.belongsToMany(Tag, {
   through: "card_has_tag",
   foreignKey: "card_id",
-  otherKey: "tag_id",
+  // otherKey: "tag_id",
   as: "tags",
 });
 
 Tag.belongsToMany(Card, {
   through: "card_has_tag",
   foreignKey: "tag_id",
-  otherKey: "card_id",
-  as: "tags",
+  // otherKey: "card_id",
+  as: "cards",
 });
 
-export const associations = { Card, List, Tag };
+export { Card, List, Tag };
