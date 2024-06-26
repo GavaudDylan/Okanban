@@ -4,7 +4,7 @@ import { Tag } from "./Tag.js";
 
 List.hasMany(Card, {
   foreignKey: "list_id",
-  as: "card",
+  as: "cards",
 });
 
 Card.belongsTo(List, {
