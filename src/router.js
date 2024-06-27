@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as listController from "./controllers/listController.js";
+import * as cardController from "./controllers/cardController.js";
 import { controllerWrapper as cw } from "./utils/controllerWrapper.js";
 
 export const router = Router();
@@ -13,7 +14,7 @@ router.delete("/lists/:id", listController.deleteList);
 
 
 // == Routes des cartes ==
-// ...
+router.post("/cards", cw(cardController.createCard));
 
 
 // Middleware 404

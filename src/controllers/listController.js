@@ -7,7 +7,7 @@ export async function getAllLists(req, res) {
     // Récupérer toutes les listes en BDD
     const lists = await List.findAll({
       order: [["position", "ASC"]],
-      // include: { association: "cards", include: "tags" } // Avec ces includes, on renvoie toute la BDD => mauvaise pratique car bcp de data sur le réseau. Avantage : faciliter notre travail en frontend plus tard
+      include: { association: "cards", include: "tags" } // Avec ces includes, on renvoie toute la BDD => mauvaise pratique car bcp de data sur le réseau. Avantage : faciliter notre travail en frontend plus tard
     });
   
     // Renvoyer au format JSON
