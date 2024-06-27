@@ -1,3 +1,4 @@
+import Joi from "joi";
 import { List } from "../models/index.js";
 
 export async function getAllLists(req, res) {
@@ -75,3 +76,36 @@ export async function getOneList(req, res) {
   res.json(list);
 }
 
+export async function updateList(req, res) {
+  console.log(req.body); // { title, position }
+  
+  // Valider le body ==> Pas en vanilla JS, outil : Joi
+  // ==> On définie ce à quoi le body que nous envoie le client doit ressembler
+  // ==> On valide nos body, mais plus à la main, avec un outil pratique !
+  const schema = Joi.object({
+    title: Joi.string().min(1), // min(1) : LORSQUE FOURNI, le nouveau titre doit avoir au moins 1 caractère
+    position: Joi.number().integer().min(1) // min(1) : LORS FOURNIE, la position doit être supérieur à 1
+  }).min(1).message("Invalid body: provide at least 'title' or 'position' property."); 
+
+  const { error } = schema.validate(req.body); // Si error est non null, alors cela signifie que le body ne passe pas la validation
+  if (error) {
+    return res.status(400).json({ error: error.message }); // Le message d'erreur est généré automatiquement par Joi
+  }
+
+
+  // - title : string non vide
+  // - position : entier, positif
+  // - au moins 1 de ces 2 champs doit être présent
+
+  // Récupérer l'id de la liste à update
+
+  // Valider l'ID de la liste
+
+  // Récupérer la liste en BDD
+  // Si elle n'existe pas => 404
+
+  // Update la liste
+
+  // Renvoyer la liste updated au client
+  res.send("OK");
+}

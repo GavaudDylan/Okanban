@@ -7,6 +7,7 @@ export const router = Router();
 router.get("/lists", cw(listController.getAllLists));
 router.get("/lists/:id", cw(listController.getOneList));
 router.post("/lists", cw(listController.createList));
+router.patch("/lists/:id", cw(listController.updateList));
 
 
 // Middleware 404
