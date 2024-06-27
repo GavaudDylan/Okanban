@@ -77,7 +77,12 @@ export async function getOneList(req, res) {
 }
 
 export async function updateList(req, res) {
-  console.log(req.body); // { title, position }
+  // console.log(req.body); // { title, position }
+  
+  // Validation du BODY :
+  // - title : string non vide
+  // - position : entier, positif
+  // - au moins 1 de ces 2 champs doit être présent
   
   // Valider le body ==> Pas en vanilla JS, outil : Joi
   // ==> On définie ce à quoi le body que nous envoie le client doit ressembler
@@ -92,20 +97,31 @@ export async function updateList(req, res) {
     return res.status(400).json({ error: error.message }); // Le message d'erreur est généré automatiquement par Joi
   }
 
-
-  // - title : string non vide
-  // - position : entier, positif
-  // - au moins 1 de ces 2 champs doit être présent
-
   // Récupérer l'id de la liste à update
+  const listId = parseInt(req.params.id);
 
   // Valider l'ID de la liste
+  if (isNaN(listId)) {
+    return res.status(404).json({ error: "List not found. Please verify the provided ID." });
+  }
 
   // Récupérer la liste en BDD
+  const list = await List.findByPk(listId);
+
   // Si elle n'existe pas => 404
+  if (! list) {
+    return res.status(404).json({ error: "List not found. Please verify the provided ID." });
+  }
 
   // Update la liste
+  if (req.body.title) {
+    list.title = req.body.title;
+  }
+  if (req.body.position) {
+    list.position = req.body.position;
+  }
+  await list.save(); // Bonne nouvelle, sequelize gère automatiquement l'update du champs `updated_at`
 
   // Renvoyer la liste updated au client
-  res.send("OK");
+  res.json(list);
 }
