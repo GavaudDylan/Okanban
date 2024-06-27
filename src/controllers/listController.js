@@ -56,3 +56,36 @@ function iStrictlyPositiveInteger(value) {
   if (value <= 0) { return false; }
   return true;
 }
+
+
+export async function getOneList(req, res) {
+  try {
+
+    // Récupérer l'ID de la liste demandée et le parser
+    const listId = parseInt(req.params.id);
+
+    // Valider l'input
+    if (isNaN(listId)) {
+      return res.status(404).json({ error: "List not found. Please verify the provided ID." });
+    }
+
+    // Peut-on écrire ça ?  ==> attentions aux injections SQL qui peuvent être présente notamment si notre ORM n'est pas à jour !
+    // const list = await List.findByPk(req.params.id);
+  
+    // Récupérer la liste en BDD
+    const list = await List.findByPk(listId);
+  
+    // Si elle n'existe pas => 404
+    if (! list) {
+      return res.status(404).json({ error: "List not found. Please verify the provided ID." });
+    }
+  
+    // Renvoie en JSON au client
+    res.json(list);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Unexpected server error. Please try again later." });
+  }
+}
+

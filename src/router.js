@@ -4,6 +4,7 @@ import * as listController from "./controllers/listController.js";
 export const router = Router();
 
 router.get("/lists", listController.getAllLists);
+router.get("/lists/:id", listController.getOneList);
 router.post("/lists", listController.createList);
 
 
