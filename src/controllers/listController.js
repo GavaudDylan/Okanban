@@ -5,7 +5,10 @@ export async function getAllLists(req, res) {
   try { // Pour la posterité, on garde ce try-catch
 
     // Récupérer toutes les listes en BDD
-    const lists = await List.findAll();
+    const lists = await List.findAll({
+      order: [["position", "ASC"]],
+      // include: { association: "cards", include: "tags" } // Avec ces includes, on renvoie toute la BDD => mauvaise pratique car bcp de data sur le réseau. Avantage : faciliter notre travail en frontend plus tard
+    });
   
     // Renvoyer au format JSON
     res.json(lists);
@@ -124,4 +127,28 @@ export async function updateList(req, res) {
 
   // Renvoyer la liste updated au client
   res.json(list);
+}
+
+export async function deleteList(req, res) {
+  // Récupérer l'ID de la liste à supprimer
+  const listId = parseInt(req.params.id);
+
+  // Vérifier que l'ID est valide
+  if (isNaN(listId)) {
+    return res.status(404).json({ error: "List not found. Please verify the provided ID." });
+  }
+
+  // Récupérer la liste à supprimer en BDD
+  const list = await List.findByPk(listId);
+
+  // Si elle n'existe pas => 404
+  if (! list) {
+    return res.status(404).json({ error: "List not found. Please verify the provided ID." });
+  }
+
+  // On supprime la liste
+  await list.destroy(); // await pour attendre que la BDD confirme la bonne suppression de l'enregistrement
+
+  // Renvoie une 204 (No content)
+  res.status(204).end(); // .end() pour répondre à une requête sans y mettre de body
 }
