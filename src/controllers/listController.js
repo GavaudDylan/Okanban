@@ -56,7 +56,8 @@ export async function createList(req, res) {
 
 export async function getListById(req, res) {
   try {
-    const list = await List.findByPk(req.params.id);
+    const listId = parseInt(req.params.id);
+    const list = await List.findByPk(listId);
 
     if (!list) {
       return res
@@ -73,7 +74,7 @@ export async function getListById(req, res) {
 
 export async function deleteList(req, res) {
   try {
-    const listId = req.params.id;
+    const listId = parseInt(req.params.id);
     const list = await List.findByPk(listId);
 
     if (!list) {
