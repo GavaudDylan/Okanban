@@ -4,11 +4,16 @@ import { controllerWrapper as cw } from "./utils/controllerWrapper.js";
 
 export const router = Router();
 
+// == Routes des lists ==
 router.get("/lists", cw(listController.getAllLists));
 router.get("/lists/:id", cw(listController.getOneList));
 router.post("/lists", cw(listController.createList));
 router.patch("/lists/:id", cw(listController.updateList));
 router.delete("/lists/:id", listController.deleteList);
+
+
+// == Routes des cartes ==
+// ...
 
 
 // Middleware 404

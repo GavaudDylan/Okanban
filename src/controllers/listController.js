@@ -152,3 +152,4 @@ export async function deleteList(req, res) {
   // Renvoie une 204 (No content)
   res.status(204).end(); // .end() pour répondre à une requête sans y mettre de body
 }
+

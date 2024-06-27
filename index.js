@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true })); // Parser les bodies de type "a
 app.use(express.json()); // Parser les bodies de type "application/json"
 
 // Configure routes
-app.use(router);
+app.use("/api", router);
 
 // Start server
 const port = process.env.PORT || 3000;
