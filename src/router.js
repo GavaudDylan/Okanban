@@ -20,14 +20,21 @@ router.post("/cards", cw(cardController.createCard));
 router.patch("/cards/:id", cw(cardController.updateCard));
 router.delete("/cards/:id", cw(cardController.deleteCard));
 
-// == Routes des Labels ==
+router.get("/lists/:id/cards", cw(cardController.getAllCardsOfList)); // Au choix, dans cardController ou listController
+
+// == Routes des tags ==
 router.get("/tags", cw(tagController.getAllTags));
-// router.get("/tags/:id", cw(tagController.))
+router.get("/tags/:id", cw(tagController.getOneTag));
 router.post("/tags", cw(tagController.createTag));
-// router.put("/tags/:id")
-// router.delete("/tags/:id")
+router.patch("/tags/:id", cw(tagController.updateTag));
+router.delete("/tags/:id", cw(tagController.deleteTag));
+router.put("/cards/:cardId/tags/:tagId", cw(tagController.assignTagToCard));
+router.delete(
+	"/cards/:cardId/tags/:tagId",
+	cw(tagController.removeTagFromCard),
+);
 
 // Middleware 404
 router.use((req, res) => {
-  res.status(404).json({ error: "Not Found" });
+	res.status(404).json({ error: "Not Found" });
 });

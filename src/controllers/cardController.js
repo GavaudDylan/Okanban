@@ -1,158 +1,168 @@
 import Joi from "joi";
-import { Card } from "../models/index.js";
-import { List } from "../models/index.js";
-
-export async function getAllCards(req, res) {
-  console.log(req.body);
-
-  const cards = await Card
-    .findAll
-    // Avec ces includes, on renvoie toute la BDD => mauvaise pratique car bcp de data sur le réseau. Avantage : faciliter notre travail en frontend plus tard
-    ();
-  res.json(cards);
-}
+import { Card, List } from "../models/index.js";
 
 export async function createCard(req, res) {
-  console.log(req.body);
-  const { content, position, color, list_id } = req.body;
+	// Create body scema
+	const schema = Joi.object({
+		content: Joi.string().required(), // require = le champ "content" est obligatoire
+		position: Joi.number().integer().min(1),
+		color: getHexadecimalColorSchema(),
+		list_id: Joi.number().integer().min(1).required(),
+	});
 
-  // Valider le body
-  const schema = Joi.object({
-    content: Joi.string().required(), // require = le champ "content" est obligatoire
-    position: Joi.number().integer().min(1),
-    color: Joi.string()
-      .pattern(new RegExp("^#(?:[0-9a-fA-F]{3}){1,2}$"))
-      .message(
-        "color property should a valid hexadecimal code starting with #"
-      ),
-    list_id: Joi.number().integer().min(1),
-  });
+	// Body validation
+	const { error } = schema.validate(req.body);
+	if (error) {
+		return res.status(400).json({ error: error.message }); // Renvoyer le message d'erreur de Joi
+	}
 
-  const { error } = schema.validate(req.body);
-  if (error) {
-    return res.status(400).json({ error: error.message }); // Renvoyer le message d'erreur de Joi
-  }
+	// Body destructuring
+	const { content, position, color, list_id } = req.body;
 
-  // Récupérer la list_id
-  const listId = req.body.list_id;
-  const list = await List.findByPk(listId);
+	// Vérifier si la liste (dans laquelle on va insérer notre nouvelle carte) existe
+	const list = await List.findByPk(list_id);
+	if (!list) {
+		return res
+			.status(404)
+			.json({
+				error: "List not found. Please verify the provided 'list_id' property.",
+			});
+	}
 
-  // Vérifier si la liste (dans laquelle on va insérer notre nouvelle carte) existe
-  if (isNaN(listId)) {
-    return res
-      .status(404)
-      .json({ error: "List not found. Please verify the provided ID." });
-  }
+	// Créer la nouvelle carte
+	const createdCard = await Card.create({ content, position, color, list_id });
 
-  if (!list) {
-    return res.status(404).json({
-      error:
-        "List not HostNotFoundError. Please verify the provided IDBCursor.",
-    });
-  }
+	// Répondre avec la nouvelle carte et un status 201
+	res.status(201).json(createdCard);
+}
 
-  // Créer la nouvelle carte
-  const createdCard = await Card.create({
-    content: content,
-    position: position,
-    color: color,
-    list_id: list_id,
-  });
+export async function getAllCards(req, res) {
+	// Récupérer les cartes (et leurs tags, pourquoi pas)
+	const cards = await Card.findAll({ include: "tags" });
 
-  // Répondre avec la nouvelle carte et un status 201
-  res.status(201).json(createdCard);
+	// Renvoyer du JSON
+	res.json(cards);
 }
 
 export async function getOneCard(req, res) {
-  console.log(req.body);
+	// Validation de l'ID
+	const { error } = Joi.number().integer().greater(0).validate(req.params.id);
+	if (error) {
+		return res
+			.status(404)
+			.json({
+				error: `Card not found. Verify the provided ID. ${error.message}`,
+			});
+	}
 
-  const cardId = parseInt(req.params.id);
+	// Récupérer la carte en BDD
+	const card = await Card.findByPk(req.params.id, { include: "tags" });
 
-  if (isNaN(cardId)) {
-    return res
-      .status(404)
-      .json({ error: "Card not found. Please verify the provided ID." });
-  }
+	// Si la liste n'existe pas
+	if (!card) {
+		return res.status(404).json({ error: "Card not found." });
+	}
 
-  const card = await Card.findByPk(cardId);
-
-  if (!card) {
-    return res
-      .status(404)
-      .json({ error: "Card not found. Please verify the provided ID." });
-  }
-  res.json(card);
+	// Envoyer une réponse
+	res.json(card);
 }
 
 export async function updateCard(req, res) {
-  console.log(req.body);
+	// Récupérer l'ID de la carte à update
+	const cardId = parseInt(req.params.id);
 
-  const shema = Joi.object({
-    content: Joi.string().required(),
-    position: Joi.number().integer().min(1),
-    color: Joi.string()
-      .pattern(new RegExp("^#(?:[0-9a-fA-F]{3}){1,2}$"))
-      .message(
-        "color property should a valid hexadecimal code starting with #"
-      ),
-    list_id: Joi.number().integer().min(1),
-  }).min(1);
+	// Valider cet ID
+	if (!Number.isInteger(cardId)) {
+		return res.status(404).json({ error: `Card not found` });
+	}
 
-  const { error } = shema.validate(req.body);
-  if (error) {
-    return res.status(400).json({ error: error.message });
-  }
+	const updateCardSchema = Joi.object({
+		content: Joi.string().min(1),
+		position: Joi.number().integer().min(1),
+		list_id: Joi.number().integer().min(1),
+		color: getHexadecimalColorSchema(),
+	})
+		.min(1)
+		.message(
+			"Missing body parameters. Provide at least 'content' or 'position' or 'list_id' or 'color' properties",
+		);
 
-  const cardId = parseInt(req.params.id);
+	const { error } = updateCardSchema.validate(req.body);
+	if (error) {
+		return res.status(400).json({ error: error.message });
+	}
 
-  if (isNaN(cardId)) {
-    return res.status(404).json({
-      error: "Card not found. Please verify the provided ID.",
-    });
-  }
+	const { content, position, list_id, color } = req.body;
 
-  const card = await Card.findByPk(cardId);
+	// Récupérer la carte en BDD
+	const card = await Card.findByPk(cardId);
 
-  if (!card) {
-    return res.status(404).json({
-      error: "Card not found. Please verify the provided ID.",
-    });
-  }
+	// Si elle existe pas => 404
+	if (!card) {
+		return res.status(404).json({ error: `Card not found` });
+	}
 
-  if (req.body.content) {
-    card.content = req.body.content;
-  }
-  if (req.body.position) {
-    card.position = req.body.position;
-  }
-  if (req.body.color) {
-    card.color = req.body.color;
-  }
-  if (req.body.list_id) {
-    card.list_id = req.body.list_id;
-  }
-  await card.save();
+	// Si l'utilisateur souhaite changer la carte de liste, vérifions si la nouvelle liste existe
+	if (list_id) {
+		const list = await List.findByPk(list_id);
+		if (!list) {
+			return res.status(404).json({ error: `List not found` });
+		}
+	}
 
-  res.json(card);
+	// On peut faire l'update
+	const updatedCard = await card.update({
+		content,
+		position,
+		color,
+		list_id,
+	});
+
+	// Renvoie la carte mise à jour
+	res.json(updatedCard);
 }
 
 export async function deleteCard(req, res) {
-  const cardId = parseInt(req.params.id);
+	// Récupérer l'Id de la carte à supprimer
+	const cardId = parseInt(req.params.id);
 
-  if (isNaN(cardId)) {
-    return res
-      .status(404)
-      .json({ error: "Card not found. Please verify the provided ID." });
-  }
+	// Validation de l'ID
+	if (!Number.isInteger(cardId)) {
+		return res.status(404).json({ error: "Card not found" });
+	}
 
-  const card = await Card.findByPk(cardId);
+	// Récupérer la carte
+	const card = await Card.findByPk(cardId);
 
-  if (!card) {
-    return res
-      .status(404)
-      .json({ error: "Card not found. Please verify the provided ID" });
-  }
-  await card.destroy();
+	// Vérification de l'existance de la carte
+	if (!card) {
+		return res.status(404).json({ error: "Card not found" });
+	}
 
-  res.status(204).end();
+	await card.destroy();
+
+	// Sinon on supprime et on renvoie une 204 avec un body vide.
+	res.status(204).end();
+}
+
+export async function getAllCardsOfList(req, res) {
+	const listId = parseInt(req.params.id);
+	if (isNaN(listId)) {
+		return res.status(404).json({ error: "Invalid listId." });
+	}
+
+	const list = await List.findByPk(listId);
+	if (!list) {
+		return res.status(404).json({ error: "List not found." });
+	}
+
+	const cards = await Card.findAll({ where: { list_id: listId } });
+	res.json(cards); // Même si la liste des cartes est vide, on renvoie un tableau vide.
+}
+
+function getHexadecimalColorSchema() {
+	// Fonction utilitaire pour ne pas avoir à se répéter
+	return Joi.string()
+		.pattern(new RegExp("^#([0-9a-fA-F]{3}){1,2}$"))
+		.message('"color" should be a valid hexadecimal code.');
 }

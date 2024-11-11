@@ -15,4 +15,3 @@ console.log(tag.toJSON());
 
 // == Fermer le tunnel de connexion Sequelize pour que le script nous rende automatiquement la main
 await sequelize.close();
-
